@@ -84,6 +84,7 @@ void swapPos(){
     if(counter != choice && counter != reveal){
       // Switch to the other available door
       choice = counter;
+      break;
     }
     // Move to next door for check
     counter++;
