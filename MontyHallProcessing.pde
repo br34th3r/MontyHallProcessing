@@ -2,14 +2,16 @@ String[] doors = new String[3];
 
 float wins = 0;
 float losses = 0;
-float repeats = 100000;
+float repeats = 1000;
 
 int choice;
 int reveal;
 
 void setup(){
-  for(int i = 0; i < repeats; i++){
+  int counter = 0;
+  while(counter < repeats){
     assignDoors();
+    counter++;
   }
   println("WINS: " + wins);
   println("LOSSES: " + losses);
@@ -20,13 +22,13 @@ void assignDoors(){
   doors[0] = "Goat";
   doors[1] = "Goat";
   doors[2] = "Goat";
-  int randInt = int(random(0, 3));
+  int randInt = int(random(3));
   doors[randInt] = "Car";
   pick();
 }
 
 void pick(){
-  choice = int(random(0, 3));
+  choice = int(random(3));
   revealGoat();
 }
 
