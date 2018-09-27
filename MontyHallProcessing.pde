@@ -1,111 +1,113 @@
-// Doors Array to Hold What's Behind Each Door
-String[] doors = new String[3];
-
-// System Data for Number of Wins, Losses and Repetitions
-float wins = 0;
-float losses = 0;
-float repeats = 10000000;
-
-// Track Variable to Ensure That Events Occur Synchronously
-boolean track = true;
-
-// User Variables for the Current Choice and the Host-Opened Door
+int numberOfDoors = 7;
+String[] doors = new String[numberOfDoors];
+int[] revealedDoors = new int[0];
+double wins = 0;
+double losses = 0;
 int choice;
 int reveal;
+int iterations = 0;
 
 // Initialise Setup Function
 void setup(){
-  // Initialise Counter for Current Repetition
-  int counter = 0;
-  
-  // Start Loop of Repetitions
-  while(counter < repeats){
-    // Check if a loop isn't already running
-    if(track){
-      // Start new repetition
-      assignDoors();
-    }
-    // Increment Repetition Number
-    counter++;
-  }
-  // Output Wins, Loss and Average
-  println("WINS: " + wins);
-  println("LOSSES: " + losses);
-  calculateTotal();
+  size(600, 600);
+  frameRate(30);
 }
 
-void assignDoors(){
-  //Reassign Track Variables
-  track = false;
-  
-  // Pre-Assign all doors to goats
-  doors[0] = "Goat";
-  doors[1] = "Goat";
-  doors[2] = "Goat";
-  
-  // Select a random integer between 0 and 2 (inclusive)
-  int randInt = int(random(3));
-  
-  // Use previously acquired random integer to assign a random car door
-  doors[randInt] = "Car";
-  
-  // Continue to user choice
+// Initialise Draw Function
+void draw(){
+  revealedDoors = new int[numberOfDoors - 2];
+  background(0);
+  assignDoors();
   pick();
+  for(int i = 0; i < numberOfDoors - 2; i++){
+    revealGoat();
+    swapPos();
+  }
+  winOrLose();
+  if(iterations > 0){
+    displayResults();
+  }
+  iterations = iterations + 1;
 }
 
+// Draw All The Doors by the Number of Doors Predefined Variable
+void drawAllDoors(){
+  int doorStart = 10;
+  for(int i = 0; i < numberOfDoors; i++){
+    drawDoor(doorStart);
+    doorStart += width/6 + 20;
+  }
+}
+
+// Assign Values to All the Doors in the Array
+void assignDoors(){
+  for(int i = 0; i < numberOfDoors; i++){
+    doors[i] = "Goat";
+  }
+  int randInt = int(random(numberOfDoors));
+  doors[randInt] = "Car";
+}
+
+// Get the User's Choice of Door
 void pick(){
-  // Random Integer between 0 and 2 (inclusive) for user's door choice
-  choice = int(random(3));
-  
-  // Continue to Reveal the Goat
-  revealGoat();
+  choice = int(random(numberOfDoors));
 }
 
+// Reveal a Random Goat
 void revealGoat(){
-  // Loop through the doors array
   int counter = 0;
-  while(counter < 3){
-    // Check if a door is not the car door or the user's choice and reveal it
-    if(doors[counter] != "Car" && counter != choice){
-      reveal = counter;
+  while(counter < numberOfDoors){
+    if(doors[counter] != "Car" && counter != choice && !existsInArray(revealedDoors, counter)){
+      revealedDoors = append(revealedDoors, counter);
+      break;
     }
-    // Move to next door for check
     counter++;
   }
-  // Move to swapping choice
-  swapPos();
 }
 
+// Swap the User Door
 void swapPos(){
-  // Loop through doors array
   int counter = 0;
-  while(counter < 3){
-    // Check to see if the current door is neither the revealed door, nor the user's choice
-    if(counter != choice && counter != reveal){
-      // Switch to the other available door
+  while(counter < numberOfDoors){
+    if(counter != choice && !existsInArray(revealedDoors, counter)){
       choice = counter;
       break;
     }
-    // Move to next door for check
     counter++;
   }
-  // Move to win or lose stage
-  winOrLose();
 }
 
+// Check if the User Won or Lost
 void winOrLose(){
-  // Check if the choice door has a car behind it
   if(doors[choice] == "Car"){
-    // Increment wins variable
     wins++;
   } else{
-    // Increment losses variable
     losses++;
   }
-  // Reset track to allow another loop to occur
-  track = true;
 }
 
-void calculateTotal(){
-  println("TOTAL PERCENTAGE: " + ((wins/repeats)*100));
+// Draw a Door
+void drawDoor(int x){
+  fill(#A0522D);
+  rect(x, 10, width/6, height/4);
+  fill(#D2691E);
+  ellipse(x+width/6-20, height/7, 20, 20);
+}
+
+// Update the Display List
+void displayResults(){
+  text("Wins: " + wins, 10, 20);
+  text("Losses: " + losses, 10, 50);
+  text("Percentage: " + (wins/iterations)*100, 10, 80);
+}
+
+// Function to See if a Value Exists in an Integer Array
+boolean existsInArray(int[] arr, int val){
+  boolean exists = false;
+  for(int arrVal : arr){
+    if(arrVal == val){
+      exists = true;
+    }
+  }
+  return exists;
 }
