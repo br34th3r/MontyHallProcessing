@@ -5,4 +5,4 @@ Controls are:
 
 * UP - Increase Door Amount
 * DOWN - Decrease Door Amount
-* Click and Hold - Pause the Simulation
+* CLICK AND HOLD - Pause the Simulation
