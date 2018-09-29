@@ -1,113 +1,84 @@
-int numberOfDoors = 7;
-String[] doors = new String[numberOfDoors];
-int[] revealedDoors = new int[0];
-double wins = 0;
-double losses = 0;
-int choice;
-int reveal;
+int doorCount = 3;
+Door[] doors;
+DataText dataDisplay = new DataText();
+DoorHandler doorHandler = new DoorHandler();
+Graph graph = new Graph();
+int doorWidth = 50;
+int doorHeight = 80;
+int doorStartX = 20;
+int doorStartY = 500;
 int iterations = 0;
+float wins = 0;
+float losses = 0;
+float percentage = 0;
+int userChoice;
+boolean paused;
 
-// Initialise Setup Function
 void setup(){
-  size(600, 600);
-  frameRate(30);
-}
-
-// Initialise Draw Function
-void draw(){
-  revealedDoors = new int[numberOfDoors - 2];
+  size(400, 400);
   background(0);
-  assignDoors();
-  pick();
-  for(int i = 0; i < numberOfDoors - 2; i++){
-    revealGoat();
-    swapPos();
-  }
-  winOrLose();
-  if(iterations > 0){
-    displayResults();
-  }
-  iterations = iterations + 1;
+  frameRate(60);
 }
 
-// Draw All The Doors by the Number of Doors Predefined Variable
-void drawAllDoors(){
-  int doorStart = 10;
-  for(int i = 0; i < numberOfDoors; i++){
-    drawDoor(doorStart);
-    doorStart += width/6 + 20;
-  }
-}
-
-// Assign Values to All the Doors in the Array
-void assignDoors(){
-  for(int i = 0; i < numberOfDoors; i++){
-    doors[i] = "Goat";
-  }
-  int randInt = int(random(numberOfDoors));
-  doors[randInt] = "Car";
-}
-
-// Get the User's Choice of Door
-void pick(){
-  choice = int(random(numberOfDoors));
-}
-
-// Reveal a Random Goat
-void revealGoat(){
-  int counter = 0;
-  while(counter < numberOfDoors){
-    if(doors[counter] != "Car" && counter != choice && !existsInArray(revealedDoors, counter)){
-      revealedDoors = append(revealedDoors, counter);
-      break;
+void draw(){
+  if(!paused){
+    background(0);
+    doors = new Door[doorCount];
+    doorHandler.displayDoorCount(doorCount);
+    randomiseDoors();
+    userChoice = int(random(doorCount));
+    for(int j = 0; j < doorCount - 2; j++){
+      for(int i = 0; i < doorCount; i++){
+        if(!doors[i].revealed && i != userChoice && !doors[i].car){
+          doors[i].revealed = true;
+          break;
+        }
+      }
+      for(int i = 0; i < doorCount; i++){
+        if(!doors[i].revealed && i != userChoice){
+          userChoice = i;
+          break;
+        }
+      }
     }
-    counter++;
-  }
-}
-
-// Swap the User Door
-void swapPos(){
-  int counter = 0;
-  while(counter < numberOfDoors){
-    if(counter != choice && !existsInArray(revealedDoors, counter)){
-      choice = counter;
-      break;
+    if(doors[userChoice].car){
+      wins++;
+    } else{
+      losses++;
     }
-    counter++;
+    iterations++;
+    percentage = (wins/iterations)*100;
+    graph.update(iterations, wins, losses, percentage);
+    dataDisplay.update(iterations, wins, losses, percentage);
   }
 }
 
-// Check if the User Won or Lost
-void winOrLose(){
-  if(doors[choice] == "Car"){
-    wins++;
-  } else{
-    losses++;
+void randomiseDoors(){
+  for(int i = 0; i < doorCount; i++){
+    doors[i] = new Door(i + 1, false, false);
   }
+  int randInt = int(random(doorCount));
+  doors[randInt].setCar();
 }
 
-// Draw a Door
-void drawDoor(int x){
-  fill(#A0522D);
-  rect(x, 10, width/6, height/4);
-  fill(#D2691E);
-  ellipse(x+width/6-20, height/7, 20, 20);
+void mousePressed(){
+  paused = true;
 }
 
-// Update the Display List
-void displayResults(){
-  text("Wins: " + wins, 10, 20);
-  text("Losses: " + losses, 10, 50);
-  text("Percentage: " + (wins/iterations)*100, 10, 80);
+void mouseReleased(){
+  paused = false;
 }
 
-// Function to See if a Value Exists in an Integer Array
-boolean existsInArray(int[] arr, int val){
-  boolean exists = false;
-  for(int arrVal : arr){
-    if(arrVal == val){
-      exists = true;
+void keyPressed(){
+  if(key == CODED){
+    if(keyCode == UP){
+      doorCount = doorCount + 1;
+    } else if(keyCode == DOWN){
+      doorCount = doorCount - 1;
     }
+    wins = 0;
+    losses = 0;
+    percentage = 0;
+    iterations = 0;
   }
-  return exists;
 }
