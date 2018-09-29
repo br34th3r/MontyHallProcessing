@@ -3,6 +3,6 @@ A simulator for the Monty Hall Problem in Mathematics written in Processing unde
 
 Controls are:
 
-UP - Increase Door Amount
-DOWN - Decrease Door Amount
-Click and Hold - Pause the Simulation
+* UP - Increase Door Amount
+* DOWN - Decrease Door Amount
+* Click and Hold - Pause the Simulation
